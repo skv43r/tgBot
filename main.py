@@ -59,6 +59,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import KB, ikb, kb_photo
 from aiogram.dispatcher.filters import Text
+from aiogram.types import ReplyKeyboardRemove
 import random
 
 TOKEN_API = "5933825181:AAFkb6ZS_VIlXclhB0qp-tPpSE83mMaHvfU"
@@ -77,6 +78,9 @@ photos = ['https://s0.rbk.ru/v6_top_pics/media/img/9/54/756709328571549.webp',
           'https://news.store.rambler.ru/img/c2375c436d119b62aeb38819b7117c20?img-format=auto&img-1-resize=height:355,fit:max&img-2-filter=sharpen']
 
 diction = dict(zip(photos, ['Вкусно и точка', 'Симпл димпл нет попыт', 'Я сам не видел, но в орле и решке смотрел', 'Не зря на юрфаке учился', 'Вижу цель не вижу препятствий']))
+random_photo = random.choice(list(diction.keys()))
+
+flag = False
 
 async def send_random(message: types.Message):
     random_photo = random.choice(list(diction.keys()))
@@ -105,27 +109,35 @@ async def description_command(message: types.Message):
 
 @dp.message_handler(Text(equals='Random photo'))
 async def open_kb_photo(message: types.Message):
-    await message.answer(text='Для получения фото - нажми на кнопку Random, для возврата в главное меню нажми Main menu',
-                         reply_markup=kb_photo)
+    await message.answer(text='Рандомная фотка',
+                         reply_markup=ReplyKeyboardRemove())
+    await send_random(message)
+    await message.delete()
 
 @dp.message_handler(Text(equals='Main menu'))
 async def open_main_menu(message: types.Message):
     await message.answer(text='Вы находитесь в главном меню',
                          reply_markup=KB)
 
-@dp.message_handler(Text(equals='Random'))
-async def send_photo(message: types.Message):
-    await send_random(message)
-
-
 @dp.callback_query_handler()
 async def callback_random_photo(callback: types.CallbackQuery):
+    global random_photo
+    global flag
     if callback.data == 'like':
-        await callback.answer("Вас рассмешнило 😂")
+        if not flag:
+            await callback.answer("Вас рассмешнило 😂")
+            flag = not flag
+        else:
+            await callback.answer('Вы уже лайкали')
     elif callback.data == 'dislike':
         await callback.answer('Согласен, не смешно 💩')
+    elif callback.data == 'main':
+        await callback.message.answer(text='Welcome to main menu',
+                                      reply_markup=KB)
+        await callback.message.delete()
+        await callback.answer()
     else:
-        random_photo = random.choice(list(diction.keys()))
+        random_photo = random.choice(list(filter(lambda x: x!= random_photo, list(diction.keys()))))
         await callback.message.edit_media(types.InputMedia(media=random_photo,
                                                            type='photo',
                                                            caption=diction[random_photo]),
