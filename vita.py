@@ -28,6 +28,7 @@ ikb = InlineKeyboardMarkup(inline_keyboard=[
 
 flag = False
 
+
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
     await message.answer(text='Привет <b>Виточка</b>, этот бот я написал для тебя',
@@ -44,7 +45,7 @@ async def btn(callback: types.CallbackQuery):
         flag = not flag
         i = 0
         while i < len(text):
-            await asyncio.sleep(10)
+            await asyncio.sleep(1800)
             await callback.message.answer(text=text[i])
             i += 1
     await callback.answer('Кнопка уже нажата',show_alert=True)
