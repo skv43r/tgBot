@@ -137,7 +137,7 @@ async def callback_random_photo(callback: types.CallbackQuery):
         await callback.message.delete()
         await callback.answer()
     else:
-        random_photo = random.choice(list(filter(lambda x: x!= random_photo, list(diction.keys()))))
+        random_photo = random.choice(list(filter(lambda x: x != random_photo, list(diction.keys()))))
         await callback.message.edit_media(types.InputMedia(media=random_photo,
                                                            type='photo',
                                                            caption=diction[random_photo]),
