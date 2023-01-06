@@ -31,7 +31,7 @@ async def ikb_close(callback: types.CallbackQuery):
 async def btn_dislike(callback: types.CallbackQuery):
     global is_vote
     if not is_vote:
-         if callback.data == 'like':
+        if callback.data == 'like':
             await callback.answer(text='123')
             is_vote = not is_vote
         else:
