@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import asyncio
 
 
-TOKEN_API = '5890557739:AAH0IuAurnzX5DfwzPb4VnYADzblWIKLE-E'
+TOKEN_API = '5889381554:AAFpRvAcLnmUZ8D6EOweUcoGnL_UADqyGoQ'
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot)
 
@@ -26,6 +26,7 @@ text = ['Витоша, я очень сильно тебя лублу и ску�
 ikb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Нажми на меня!!', callback_data='button')]])
 
+flag = False
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
@@ -37,11 +38,17 @@ async def cmd_start(message: types.Message):
 
 @dp.callback_query_handler(text='button')
 async def btn(callback: types.CallbackQuery):
-    i = 0
-    while i < len(text):
-        await asyncio.sleep(1800)
-        await callback.message.answer(text=text[i])
-        i += 1
+    global flag
+    await callback.message.delete()
+    if not flag:
+        flag = not flag
+        i = 0
+        while i < len(text):
+            await asyncio.sleep(10)
+            await callback.message.answer(text=text[i])
+            i += 1
+    await callback.answer('Кнопка уже нажата',show_alert=True)
+
 
 async def on_startup(_):
     print('Bot in progress')
