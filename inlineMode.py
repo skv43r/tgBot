@@ -38,7 +38,10 @@ async def cmd_start(message: types.Message):
 @dp.inline_handler()
 async def inline_echo(inline_query: types.InlineQuery):
     text = inline_query.query or 'Echo'
-    input_content = InputTextMessageContent(text)
+    if text == 'photo':
+        input_content = InputTextMessageContent('This is a photo')
+    else:
+        input_content = InputTextMessageContent(text)
     result_id: str = hashlib.md5(text.encode()).hexdigest()
     item = InlineQueryResultArticle(
         input_message_content=input_content,
