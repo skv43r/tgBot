@@ -24,7 +24,7 @@ async def text_handler(message: types.Message):
 @dp.inline_handler()
 async def inline_echo(inline_query: types.inline_query):
     text = inline_query.query or 'Echo'
-    result_id: str = hashlib.md5(text.encode()).hexdigest()
+    result_id= hashlib.md5(text.encode()).hexdigest()
     input_content = InputTextMessageContent(f'<b>{text}</b> - {user_data}',
                                             parse_mode='HTML')
     item = InlineQueryResultArticle(
