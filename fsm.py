@@ -1,14 +1,20 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
-from config import token, on_startup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+
+from config import token
+from sqlite import db_start, create_profile, edit_profile
 
 
 storage = MemoryStorage()
 bot = Bot(token)
 dp = Dispatcher(bot, storage=storage)
+
+
+async def on_startup(_):
+    await db_start()
 
 
 class ProfileStatesGroup(StatesGroup):
@@ -44,6 +50,7 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
 async def cmd_start(message: types.Message):
     await message.answer('Welcome, to create a profile type: /create',
                          reply_markup=get_kb())
+    await create_profile(user_id=message.from_user.id)
 
 
 @dp.message_handler(commands=['create'])
@@ -94,9 +101,12 @@ async def load_gender(message: types.Message, state: FSMContext):
         await bot.send_photo(chat_id=message.from_user.id,
                              photo=data['photo'],
                              caption=f"Name: {data['name']}\nAge: {data['age']}\nGender: {data['gender']}")
+    await edit_profile(state, user_id=message.from_user.id)
     await message.reply('Thank you')
     await state.finish()
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp,
+                           skip_updates=True,
+                           on_startup=on_startup)
